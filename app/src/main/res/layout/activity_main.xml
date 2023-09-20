@@ -49,4 +49,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/progressTextBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/secondClauseTextBox"
+        android:layout_marginTop="257dp"
+        android:background="?attr/colorAccent"
+        android:layout_centerHorizontal="true"
+        android:text="Current Stage"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/resultTextBox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </RelativeLayout>

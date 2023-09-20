@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var firstClauseTextBox: TextView
     private lateinit var secondClauseTextBox: TextView
     private lateinit var resultTextBox: TextView
+    private lateinit var progressTextBox: TextView
     private lateinit var paragraphScrollView: ScrollView
     private val paragraphs: Array<String> = arrayOf(
         "Paul, an apostle of Christ Jesus through the will of God, to the saints who are in Ephesus and are faithful in Christ Jesus:",
@@ -70,9 +71,12 @@ class MainActivity : AppCompatActivity() {
         resultTextBox = findViewById(R.id.resultTextBox)
         resultTextBox.isVisible = false
 
+        progressTextBox = findViewById(R.id.progressTextBox)
+
         if (savedInstanceState != null) {
             onRestoreInstanceState(savedInstanceState)
         }
+
         initialiseClauses()
     }
 
@@ -252,6 +256,8 @@ class MainActivity : AppCompatActivity() {
 
         setFirstClause(firstClauseIdx)
         setSecondClause(secondClauseIdx)
+
+        progressTextBox.text = "Level $currentLevel Stage $currentStage"
     }
 
     private fun setFirstClause(idx: Int){

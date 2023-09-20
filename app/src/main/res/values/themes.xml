@@ -3,7 +3,7 @@
     <style name="Base.Theme.WordStream" parent="Theme.MaterialComponents.Light">
         <item name="colorPrimary">@color/blue</item>
         <item name="colorSecondary">@color/dark_blue</item>
-        <item name="colorAccent">@color/pink</item>
+        <item name="colorAccent">@color/dark_green</item>
         <item name="colorError">@color/pink</item>
         <item name="colorTertiary">@color/light_green</item>
     </style>
