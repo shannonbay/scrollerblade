@@ -4,10 +4,12 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.color.MaterialColors
 import java.lang.StringBuilder
 import java.util.LinkedList
 import java.util.Random
@@ -90,22 +92,23 @@ class MainActivity : AppCompatActivity() {
             if(firstClauseIdx > secondClauseIdx) {
                 results.set(secondClauseIdx, false)
                 resultTextBox.text = "Mmmm"
-                resultTextBox.setBackgroundColor(Color.RED)
+                resultTextBox.setBackgroundColor(androidx.appcompat.R.attr.colorError)
             } else {
                 results.set(secondClauseIdx, true)
                 resultTextBox.text = "Amen!"
-                resultTextBox.setBackgroundColor(Color.GREEN)
+                resultTextBox.setBackgroundColor(MaterialColors.getColor(resultTextBox, com.google.android.material.R.attr.colorTertiary))
             }
         } else {
             if(firstClauseIdx < secondClauseIdx) {
                 results.set(secondClauseIdx, false)
                 resultTextBox.text = "Mmmm"
-                resultTextBox.setBackgroundColor(Color.RED)
+
+                resultTextBox.setBackgroundColor(androidx.appcompat.R.attr.colorError)
             } else {
                 Log.e("LVL", "current clause Idx: " + secondClauseIdx + " results size:" + results.size)
                 results.set(secondClauseIdx, true)
                 resultTextBox.text = "Amen!"
-                resultTextBox.setBackgroundColor(Color.GREEN)
+                resultTextBox.setBackgroundColor(MaterialColors.getColor(resultTextBox, com.google.android.material.R.attr.colorTertiary))
             }
         }
         if(!results.contains(false)) nextLevel()
