@@ -1,0 +1,51 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/paragraphTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your paragraph text goes here..."
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/firstClauseTextBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@android:color/holo_green_dark"
+        android:text="First Clause"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/secondClauseTextBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/firstClauseTextBox"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:background="@android:color/darker_gray"
+        android:text="Second Clause"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/resultTextBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/secondClauseTextBox"
+        android:layout_marginTop="82dp"
+        android:background="@android:color/darker_gray"
+        android:layout_centerHorizontal="true"
+        android:text="Result"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/secondClauseTextBox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</RelativeLayout>
