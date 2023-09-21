@@ -33,12 +33,25 @@ fun initSessionStateRoot(sp: SharedPreferences) {
     sp.edit().apply()
 }
 
-abstract class SessionStateField<T>(val row: UUID, val name: String, var _value: T, val context: Context) : ViewModel() {
+class LazyInit<T>(private val initializer: () -> T) {
+    private var _blah : T = initializer()
+    var blah: T
+        get() {
+            return _blah
+        }
+        set(newValue) {
+            _blah = newValue
+        }
+}
+
+abstract class SessionStateField<T>(val row: UUID, val name: String, val default: T, val context: Context) : ViewModel() {
     override fun toString(): String {
-        return value.toString()
+        return "{ $name $value }"
     }
 
-    internal val default = _value
+    internal val _value by lazy { LazyInit { getDirty() } }
+
+    //    protected var _value = default
     internal val sharedPreferences : SharedPreferences by lazy {
         context.getSharedPreferences(
             row.toString(),
@@ -57,21 +70,16 @@ abstract class SessionStateField<T>(val row: UUID, val name: String, var _value:
     }
 //        get() = _valueLiveData
 
-    open var value: T
+    var value: T
         get() {
-            if(isDirty) {
-                _value = getDirty()
-                isDirty = false
-                return _value
-            }
-            return _value
+            return _value.blah
         }
         set(newValue) {
             if (_value != newValue) {
-                _value = newValue
+                _value.blah = newValue
                 // Set the dirty flag when the value changes
                 isDirty = true
-                Log.e("STATE", "Posting $newValue")
+                Log.e("STATE", "Posting $newValue $_value $value ")
                 _valueLiveData.postValue( newValue )
                 _valueLiveData.setValue( newValue )
                 _valueLiveData.value = newValue
@@ -100,7 +108,7 @@ class RefField(row: UUID, name: String, value: UUID, context: Context) : Session
     }
 }
 
-class StringField(row: UUID, name: String, value: String, context: Context) : SessionStateField<String>(row, name, value, context) {
+class StringField(row: UUID, name: String, val __value: String, context: Context) : SessionStateField<String>(row, name, __value, context) {
     fun apply(){
         editor.putString(name, value)
         editor.apply()
@@ -112,16 +120,8 @@ class StringField(row: UUID, name: String, value: String, context: Context) : Se
 }
 
 class IntField(row: UUID, name: String, value: Int, context: Context) : SessionStateField<Int>(row, name, value, context) {
-    override var value: Int
-       get() {
-            return super.value
-        }
-        set(newValue) {
-            super.value = newValue
-        }
-
     operator fun inc(): IntField {
-        _value++
+        _value.blah++
         return this
     }
     fun apply(){
@@ -140,11 +140,25 @@ class IntField(row: UUID, name: String, value: Int, context: Context) : SessionS
  * @param value default if no value already exists, otherwise it is initial value and default
  */
 fun createIntField(name: String, value: Int): ViewModelProvider.Factory {
+    Log.d("STATE", "Creating factory for $name with $value")
     return object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             if (modelClass.isAssignableFrom(IntField::class.java)) {
                 @Suppress("UNCHECKED_CAST")
+                Log.d("STATE", "Creating $name with $value")
                 return IntField(root, name, value, context) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+}
+
+fun createStringField(name: String, value: String): ViewModelProvider.Factory {
+    return object : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            if (modelClass.isAssignableFrom(StringField::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return StringField(root, name, value, context) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }

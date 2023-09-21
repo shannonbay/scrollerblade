@@ -53,17 +53,20 @@ class MainActivity : AppCompatActivity() {
 
     private val levels = paragraphs.map { p -> splitSentenceIntoPhrases(p) }
 
-    private val firstClauseIdx: IntField by viewModels<IntField> {
-        return@viewModels createIntField("first", 0)
+    private val firstClause: StringField by viewModels {
+        createStringField("firstClause", "hello")
     }
-    private val secondClauseIdx : IntField by viewModels<IntField> {
-        return@viewModels createIntField("second", 1)
+    private val firstClauseIdx: IntField by viewModels {
+        createIntField("first", 0)
     }
-    private val currentLevel : IntField by viewModels<IntField> {
-        return@viewModels createIntField("level", 0)
+    private val secondClauseIdx : IntField by viewModels {
+        createIntField("second", 1)
     }
-    private val currentStage : IntField by viewModels<IntField> {
-        return@viewModels createIntField("second", 0)
+    private val currentLevel : IntField by viewModels {
+        createIntField("level", 0)
+    }
+    private val currentStage : IntField by viewModels {
+        createIntField("second", 0)
     }
 
     private var startY = 0f
@@ -75,12 +78,15 @@ class MainActivity : AppCompatActivity() {
 
         initSessionState(applicationContext)
 
+        firstClause.value = "bye2"
+        Log.d("STATE", "${firstClause.value}")
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.setVariable(BR.firstClauseIdx, firstClauseIdx)
+        binding.setVariable(BR.firstClause, firstClause)
         binding.lifecycleOwner = this // Set the lifecycle owner for LiveData updates
 
         firstClauseIdx.value = 9
-        firstClauseIdx._value = 9
+        secondClauseIdx.value = 200
+        logState(SaveLoadOption.Debug)
 
         Log.d("STATE","${firstClauseIdx.valueLiveData.isInitialized} ${firstClauseIdx.valueLiveData.value} ")
 
@@ -169,7 +175,7 @@ class MainActivity : AppCompatActivity() {
     private fun logState(save: SaveLoadOption) {
         Log.d(
             "STATE",
-            "$save lvl: ${currentLevel} ${currentLevel.value} stage: ${currentStage.value} firstClauseIdx: $firstClauseIdx secondClauseIdx: $secondClauseIdx"
+            "$save lvl: ${currentLevel} ${currentLevel.value} stage: ${currentStage.value} firstClauseIdx: ${firstClauseIdx.value} secondClauseIdx: $secondClauseIdx"
         )
     }
 

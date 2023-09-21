@@ -5,8 +5,8 @@
 
     <data>
         <variable
-            name="firstClauseIdx"
-            type="com.github.shannonbay.wordstream.IntField" />
+            name="firstClause"
+            type="com.github.shannonbay.wordstream.StringField" />
     </data>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:background="?attr/colorSecondary"
-            android:text="@{firstClauseIdx.value.toString()}"
+            android:text="@{firstClause.value.toString()}"
             android:textSize="18sp" />
 
         <TextView
@@ -65,7 +65,7 @@
             android:layout_marginTop="257dp"
             android:background="?attr/colorAccent"
             android:layout_centerHorizontal="true"
-            android:text="@{firstClauseIdx.value.toString()}"
+            android:text="@{firstClause.value.toString()}"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="@id/resultTextBox"
             app:layout_constraintEnd_toEndOf="parent"
