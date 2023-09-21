@@ -1,67 +1,76 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/paragraphTextView"
+    <data>
+        <variable
+            name="firstClauseIdx"
+            type="com.github.shannonbay.wordstream.IntField" />
+    </data>
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:text="Your paragraph text goes here..."
-        android:textSize="18sp" />
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/firstClauseTextBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:background="?attr/colorSecondary"
-        android:text="First Clause"
-        android:textSize="18sp" />
+        <TextView
+            android:id="@+id/paragraphTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:text="Your paragraph text goes here..."
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/secondClauseTextBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/firstClauseTextBox"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:background="?attr/colorPrimary"
-        android:text="Second Clause"
-        android:textSize="18sp" />
+        <TextView
+            android:id="@+id/firstClauseTextBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/colorSecondary"
+            android:text="@{firstClauseIdx.value.toString()}"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/resultTextBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/secondClauseTextBox"
-        android:layout_marginTop="82dp"
-        android:background="?attr/colorTertiary"
-        android:layout_centerHorizontal="true"
-        android:text="Result"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@id/secondClauseTextBox"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/secondClauseTextBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/firstClauseTextBox"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/colorPrimary"
+            android:text="Second Clause"
+            android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/progressTextBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/secondClauseTextBox"
-        android:layout_marginTop="257dp"
-        android:background="?attr/colorAccent"
-        android:layout_centerHorizontal="true"
-        android:text="Current Stage"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@id/resultTextBox"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/resultTextBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/secondClauseTextBox"
+            android:layout_marginTop="82dp"
+            android:background="?attr/colorTertiary"
+            android:layout_centerHorizontal="true"
+            android:text="Result"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/secondClauseTextBox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/progressTextBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/secondClauseTextBox"
+            android:layout_marginTop="257dp"
+            android:background="?attr/colorAccent"
+            android:layout_centerHorizontal="true"
+            android:text="@{firstClauseIdx.value.toString()}"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@id/resultTextBox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </RelativeLayout>
+</layout>

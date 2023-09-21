@@ -1,26 +1,24 @@
 package com.github.shannonbay.wordstream;
 
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.util.Log
 import android.view.MotionEvent
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.preference.PreferenceManager
+import androidx.databinding.DataBindingUtil
+import com.github.shannonbay.wordstream.databinding.ActivityMainBinding
 import com.google.android.material.color.MaterialColors
 import java.util.LinkedList
 import java.util.Random
 
-
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var sharedPreferences: SharedPreferences
-
     private lateinit var paragraphTextView: TextView
-    private lateinit var firstClauseTextBox: TextView
+    lateinit var firstClauseTextBox: TextView
+
     private lateinit var secondClauseTextBox: TextView
     private lateinit var resultTextBox: TextView
     private lateinit var progressTextBox: TextView
@@ -52,9 +50,21 @@ class MainActivity : AppCompatActivity() {
         // Add more paragraphs as needed
     )
 
+
     private val levels = paragraphs.map { p -> splitSentenceIntoPhrases(p) }
-    private var currentLevel = 0
-    private var currentStage = 0
+
+    private val firstClauseIdx: IntField by viewModels<IntField> {
+        return@viewModels createIntField("first", 0)
+    }
+    private val secondClauseIdx : IntField by viewModels<IntField> {
+        return@viewModels createIntField("second", 1)
+    }
+    private val currentLevel : IntField by viewModels<IntField> {
+        return@viewModels createIntField("level", 0)
+    }
+    private val currentStage : IntField by viewModels<IntField> {
+        return@viewModels createIntField("second", 0)
+    }
 
     private var startY = 0f
 
@@ -63,10 +73,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        initSessionState(applicationContext)
+
+        val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.setVariable(BR.firstClauseIdx, firstClauseIdx)
+        binding.lifecycleOwner = this // Set the lifecycle owner for LiveData updates
+
+        firstClauseIdx.value = 9
+        firstClauseIdx._value = 9
+
+        Log.d("STATE","${firstClauseIdx.valueLiveData.isInitialized} ${firstClauseIdx.valueLiveData.value} ")
 
         paragraphTextView = findViewById(R.id.paragraphTextView)
         firstClauseTextBox = findViewById(R.id.firstClauseTextBox)
+        firstClauseTextBox.isVisible = true
         secondClauseTextBox = findViewById(R.id.secondClauseTextBox)
         resultTextBox = findViewById(R.id.resultTextBox)
         resultTextBox.isVisible = false
@@ -86,75 +106,97 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkResult(guessBefore: Boolean) {
-        val up = if(guessBefore) "down" else "up"
+        val up = if (guessBefore) "down" else "up"
         Log.e("LVL", "first Idx: $firstClauseIdx second Idx:$secondClauseIdx guess: $up")
-        if(guessBefore) {
-            if(firstClauseIdx > secondClauseIdx) {
-                results.set(secondClauseIdx, false)
+        if (guessBefore) {
+            if (firstClauseIdx.value > secondClauseIdx.value) {
+                results.set(secondClauseIdx.value, false)
                 resultTextBox.text = "Mmmm"
-                resultTextBox.setBackgroundColor(MaterialColors.getColor(resultTextBox, com.google.android.material.R.attr.colorError))
+                resultTextBox.setBackgroundColor(
+                    MaterialColors.getColor(
+                        resultTextBox,
+                        com.google.android.material.R.attr.colorError
+                    )
+                )
             } else {
-                results.set(secondClauseIdx, true)
+                results.set(secondClauseIdx.value, true)
                 resultTextBox.text = "Amen!"
-                resultTextBox.setBackgroundColor(MaterialColors.getColor(resultTextBox, com.google.android.material.R.attr.colorTertiary))
+                resultTextBox.setBackgroundColor(
+                    MaterialColors.getColor(
+                        resultTextBox,
+                        com.google.android.material.R.attr.colorTertiary
+                    )
+                )
             }
         } else {
-            if(firstClauseIdx < secondClauseIdx) {
-                results.set(secondClauseIdx, false)
+            if (firstClauseIdx.value < secondClauseIdx.value) {
+                results.set(secondClauseIdx.value, false)
                 resultTextBox.text = "Mmmm"
 
-                resultTextBox.setBackgroundColor(MaterialColors.getColor(resultTextBox, com.google.android.material.R.attr.colorError))
+                resultTextBox.setBackgroundColor(
+                    MaterialColors.getColor(
+                        resultTextBox,
+                        com.google.android.material.R.attr.colorError
+                    )
+                )
             } else {
-                Log.e("LVL", "current clause Idx: " + secondClauseIdx + " results size:" + results.size)
-                results.set(secondClauseIdx, true)
+                Log.e(
+                    "LVL",
+                    "current clause Idx: " + secondClauseIdx + " results size:" + results.size
+                )
+                results.set(secondClauseIdx.value, true)
                 resultTextBox.text = "Amen!"
-                resultTextBox.setBackgroundColor(MaterialColors.getColor(resultTextBox, com.google.android.material.R.attr.colorTertiary))
+                resultTextBox.setBackgroundColor(
+                    MaterialColors.getColor(
+                        resultTextBox,
+                        com.google.android.material.R.attr.colorTertiary
+                    )
+                )
             }
         }
         resultTextBox.isVisible = true
-        if(!results.contains(false)) nextLevel()
+        if (!results.contains(false)) nextLevel()
     }
+
 
     override fun onResume() {
         super.onResume()
         //val preferences = getSharedPreferences("MyPreferences", MODE_PRIVATE)
-        val value = sharedPreferences.getString("key", "default value")
-        currentLevel = sharedPreferences.getInt("currentLevel", 0)
-        currentStage = sharedPreferences.getInt("currentStage", 0)
-        firstClauseIdx = sharedPreferences.getInt("firstClauseIdx", 0)
-        secondClauseIdx = sharedPreferences.getInt("secondClauseIdx", 1)
         initialiseClauses()
-        Log.d("STATE",
-            "Load lvl: $currentLevel stage: $currentStage firstClauseIdx: $firstClauseIdx secondClauseIdx: $secondClauseIdx"
-        )
-        setFirstClause(firstClauseIdx)
-        setSecondClause(secondClauseIdx)
-    }
-    override fun onPause(){
-        super.onPause()
-        //val preferences = getSharedPreferences("MyPreferences", MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putInt("currentLevel", currentLevel)
-        editor.putInt("currentStage", currentStage)
-        editor.putInt("firstClauseIdx", firstClauseIdx)
-        editor.putInt("secondClauseIdx", secondClauseIdx)
-        editor.apply()
-    }
-    override fun onSaveInstanceState(outState: Bundle) {
-        Log.d("STATE", "Save lvl: " + currentLevel + " stage: " + currentStage + " firstClauseIdx: " + firstClauseIdx + " secondClauseIdx: " + secondClauseIdx)
-        outState.putInt("currentLevel", currentLevel)
-        outState.putInt("currentStage", currentStage)
-        outState.putInt("firstClauseIdx", firstClauseIdx)
-        outState.putInt("secondClauseIdx", secondClauseIdx)
-        super.onSaveInstanceState(outState)
+        logState(SaveLoadOption.Save)
     }
 
-    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
-        Log.e("LVL", "Save2 1: " + firstClauseIdx + " 2: " + secondClauseIdx)
-        outState.putInt("currentLevel", currentLevel)
-        outState.putInt("currentStage", currentStage)
-        outState.putInt("firstClauseIdx", firstClauseIdx)
-        outState.putInt("secondClauseIdx", secondClauseIdx)
+    private fun logState(save: SaveLoadOption) {
+        Log.d(
+            "STATE",
+            "$save lvl: ${currentLevel} ${currentLevel.value} stage: ${currentStage.value} firstClauseIdx: $firstClauseIdx secondClauseIdx: $secondClauseIdx"
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        //val preferences = getSharedPreferences("MyPreferences", MODE_PRIVATE)
+
+        // TODO apply should only call editor apply once for the whole row, if the row is dirty
+        firstClauseIdx.apply()
+        secondClauseIdx.apply()
+        currentLevel.apply()
+        currentStage.apply()
+    }
+
+    private enum class SaveLoadOption {
+        Save,
+        Load,
+        Debug
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        logState(SaveLoadOption.Save)
+        firstClauseIdx.apply()
+        secondClauseIdx.apply()
+        currentLevel.apply()
+        currentStage.apply()
+
         super.onSaveInstanceState(outState)
     }
 
@@ -181,6 +223,7 @@ class MainActivity : AppCompatActivity() {
     override fun setFinishOnTouchOutside(finish: Boolean) {
         super.setFinishOnTouchOutside(finish)
     }
+
     val debouncer = Debouncer()
 
     fun splitSentenceIntoPhrases(sentence: String): List<String> {
@@ -200,53 +243,78 @@ class MainActivity : AppCompatActivity() {
 
     private val clauses = LinkedList<String>()
 
-    private var firstClauseIdx = 0;
-    private var secondClauseIdx = 1;
+
+
+
     /**
      * Levels consist of level and stage (current verse, and how many preceding verses respectively)
      */
     private fun nextLevel() {
 
-        currentStage++
-        if(currentStage > currentLevel) {
-            currentStage = 0
-            currentLevel++
-            if(currentLevel > paragraphs.size) {
+        currentStage.inc()
+        if(currentStage.value > currentLevel.value) {
+            currentStage.value = 0
+            currentLevel.inc()
+            if(currentLevel.value > paragraphs.size) {
                 clauses.clear()
                 clauses.add("End of Game"); // TODO signal end of game some other way or go into loop mode
+            } else {
+                // Initialise clauses for current level
+                clauses.addAll(levels.get(currentLevel.value))
             }
         }
 
-        setFirstClause(0)
-        setSecondClause(1)
+        firstClauseIdx.value = 0
+        secondClauseIdx.value = 1
         initialiseClauses()
+    }
+
+    fun weightedRandomSelection(chanceArray: Array<Double>): Int {
+        val cdfArray = DoubleArray(chanceArray.size)
+        var sum = 0.0
+        for (i in chanceArray.indices) {
+            sum += chanceArray[i]
+            cdfArray[i] = sum
+        }
+        val randNum = Math.random() * sum
+        var low = 0
+        var high = cdfArray.size - 1
+        while (low < high) {
+            val mid = (low + high) / 2
+            if (randNum < cdfArray[mid]) {
+                high = mid
+            } else {
+                low = mid + 1
+            }
+        }
+        return low
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        currentLevel = savedInstanceState.getInt("currentLevel")
-        currentStage = Math.max(0,savedInstanceState.getInt("currentStage"))
-        firstClauseIdx = savedInstanceState.getInt("firstClauseIdx")
-        secondClauseIdx = savedInstanceState.getInt("secondClauseIdx")
-        Log.d("STATE", "Load lvl: " + currentLevel + " stage: " + currentStage + " firstClauseIdx: " + firstClauseIdx + " secondClauseIdx: " + secondClauseIdx)
+        logState(SaveLoadOption.Load)
         initialiseClauses()
     }
 
     private fun initialiseClauses() {
         // Check if game over and assign current paragraph
-        if (currentLevel < paragraphs.size) {
-            paragraphTextView.text = paragraphs[currentLevel]
+        if (currentLevel.value < paragraphs.size) {
+            paragraphTextView.text = paragraphs[currentLevel.value]
         } else {
             paragraphTextView.text = "End of the game."
             return
         }
 
+        logState(SaveLoadOption.Debug)
         // Initialise clauses for current stage
         clauses.clear()
-        for (stage in currentStage downTo 0) {
-            val stageClauses = levels.get(currentLevel - stage)
+        for (stage in currentStage.value downTo 0) {
+            Log.d("STATE", "stage: $stage lvl: ${currentLevel.value} idx: ${currentLevel.value-stage}")
+            val stageClauses = levels.get(currentLevel.value - stage)
             clauses.addAll(stageClauses)
         }
+
+
         val sb = StringBuilder()
         for (clause in clauses) {
             sb.append(clause).append(":")
@@ -254,33 +322,19 @@ class MainActivity : AppCompatActivity() {
         Log.e("LVL", sb.toString())
         results = ArrayList(List(clauses.size) { false })
 
-        setFirstClause(firstClauseIdx)
-        setSecondClause(secondClauseIdx)
-
         progressTextBox.text = "Level $currentLevel Stage $currentStage"
-    }
-
-    private fun setFirstClause(idx: Int){
-        firstClauseIdx = idx
-        firstClauseTextBox.text = clauses.get(firstClauseIdx)
-    }
-
-    private fun setSecondClause(idx: Int){
-        secondClauseIdx = idx
-        secondClauseTextBox.text = clauses.get(secondClauseIdx)
     }
 
     private var results = ArrayList<Boolean>()
     private val random = Random()
 
     private fun showRandomClause() {
-        setFirstClause(secondClauseIdx)
+        firstClauseIdx.value = secondClauseIdx.value
 
         // Choose a random clause excluding the prevClause
         // -1 since the prevClause is excluded
-        var randomIndex = random.nextInt(clauses.size-1)
-        secondClauseIdx = if(randomIndex >= firstClauseIdx) randomIndex+1 else randomIndex
+        var randomIndex = random.nextInt(currentStage.value+1) + clauses.size - currentStage.value+1
+        secondClauseIdx.value = if(randomIndex >= firstClauseIdx.value) randomIndex+1 else randomIndex
 
-        setSecondClause(secondClauseIdx)
     }
 }

@@ -1,11 +1,16 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
 }
 
 android {
     namespace = "com.github.shannonbay.wordstream"
     compileSdk = 34
+
+    viewBinding {
+        enable = true
+    }
 
     defaultConfig {
         applicationId = "com.github.shannonbay.wordstream"
@@ -34,6 +39,7 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        dataBinding = true
         viewBinding = true
     }
 }
@@ -47,6 +53,10 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.2")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.2")
     implementation("androidx.preference:preference:1.2.0")
+    implementation("androidx.databinding:databinding-runtime:8.1.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1") // or the latest version
+    implementation("androidx.lifecycle:lifecycle-livedata:2.3.1") // or the latest version
+
 
 
     testImplementation("junit:junit:4.13.2")
