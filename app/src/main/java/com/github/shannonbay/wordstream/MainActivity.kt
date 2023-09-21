@@ -11,9 +11,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.map
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.github.shannonbay.wordstream.databinding.ActivityMainBinding
 import com.google.android.material.color.MaterialColors
-import java.util.LinkedList
 import java.util.Random
 
 class MainActivity : AppCompatActivity() {
@@ -49,34 +51,23 @@ class MainActivity : AppCompatActivity() {
         "Far above all rule and authority and power and lordship and every name that is named not only in this age but also in that which is to come;",
         "And He subjected all things under His feet and gave Him to be Head over all things to the church,",
         "Which is His Body, the fullness of the One who fills all in all."
-        // Add more paragraphs as needed
     )
 
+    private val book = Book(paragraphs.map { p -> splitSentenceIntoPhrases(p) })
 
-    private val levels = paragraphs.map { p -> splitSentenceIntoPhrases(p) }
+    class MyViewModel(private val firstClauseIdx: IntField,
+                      private val secondClauseIdx: IntField,
+                      private val book: Book) : ViewModel() {
 
-    class MyViewModel(val firstClauseIdx: IntField) : ViewModel() {
-        private val _stringField = firstClauseIdx.valueLiveData
-        val stringField: LiveData<String>
-            get() = _stringField
+        val firstClause: LiveData<String>
+            get() = firstClauseIdx.valueLiveData.map { a -> book.clauses[a!!] }
 
-        fun getText(): String {
-            return firstClauseIdx.value.toString() + "bye"
-        }
-
-        private val _intField = MutableLiveData<Int>()
-
-        val intField: LiveData<Int>
-            get() = _intField
-
-        init {
-            // Initialize intField with an initial value
-            _intField.value = 0
-        }
+        val secondClause: LiveData<String>
+            get() = secondClauseIdx.valueLiveData.map { a -> book.clauses[a!!] }
     }
 
-    val firstClause : MyViewModel by lazy {
-        MyViewModel(firstClauseIdx)
+    private val viewModel:  MyViewModel by lazy {
+        MyViewModel(firstClauseIdx, secondClauseIdx, book)
     }
 
     private val firstClauseIdx: IntField by lazy {
@@ -89,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         createIntField("level", 0)
     }
     private val currentStage : IntField by lazy {
-        createIntField("second", 0)
+        createIntField("stage", 0)
     }
 
     private var startY = 0f
@@ -101,30 +92,43 @@ class MainActivity : AppCompatActivity() {
 
         initSessionState(applicationContext)
 
-        Log.d("STATE", "${firstClause}")
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.setVariable(BR.firstClause, firstClause)
+
+        /*viewModel = ViewModelProvider(this, MyViewModelFactory(firstClauseIdx, secondClauseIdx, book))
+            .get(MyViewModel::class.java)*/
+        binding.setVariable(BR.viewModel, viewModel)
         binding.lifecycleOwner = this // Set the lifecycle owner for LiveData updates
 
-        firstClauseIdx.value = 9
-        logState(SaveLoadOption.Debug)
+        Log.d("STATE", "${viewModel} ${viewModel.secondClause.hasActiveObservers()}")
 
-        Log.d("STATE","${firstClauseIdx.valueLiveData.isInitialized} ${firstClauseIdx.valueLiveData.value} ")
+        logState(SaveLoadOption.Debug)
+        firstClauseIdx.value
+        secondClauseIdx.value
+
+        Log.d("STATE","firstClauseIdx init? ${firstClauseIdx.valueLiveData.isInitialized} ${firstClauseIdx.valueLiveData.value} ")
 
         paragraphTextView = findViewById(R.id.paragraphTextView)
         firstClauseTextBox = findViewById(R.id.firstClauseTextBox)
-        firstClauseTextBox.isVisible = true
         secondClauseTextBox = findViewById(R.id.secondClauseTextBox)
         resultTextBox = findViewById(R.id.resultTextBox)
         resultTextBox.isVisible = false
 
         progressTextBox = findViewById(R.id.progressTextBox)
 
-        if (savedInstanceState != null) {
-            onRestoreInstanceState(savedInstanceState)
-        }
+        results = ArrayList(List(book.clauses.size){ false })
 
-        initialiseClauses()
+        progressTextBox.text = "Level $currentLevel Stage $currentStage"
+
+        firstClauseIdx.value = firstClauseIdx.value.toInt()
+        secondClauseIdx.value = secondClauseIdx.value.toInt()
+
+    }
+
+    class MyViewModelFactory(val firstClauseIdx: IntField, val secondClauseIdx: IntField, val book: Book) :
+        ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            return MyViewModel(firstClauseIdx, secondClauseIdx, book) as T
+        }
     }
 
     override fun onGenericMotionEvent(event: MotionEvent?): Boolean {
@@ -189,14 +193,16 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         //val preferences = getSharedPreferences("MyPreferences", MODE_PRIVATE)
-        initialiseClauses()
         logState(SaveLoadOption.Save)
     }
 
     private fun logState(save: SaveLoadOption) {
         Log.d(
             "STATE",
-            "$save lvl: ${currentLevel} ${currentLevel.value} stage: ${currentStage.value} firstClauseIdx: ${firstClauseIdx.value} secondClauseIdx: $secondClauseIdx"
+            "$save lvl: ${currentLevel} ${currentLevel.value} " +
+                    "stage: ${currentStage.value} " +
+                    "firstClauseIdx: ${firstClauseIdx} " +
+                    "secondClauseIdx: $secondClauseIdx"
         )
     }
 
@@ -204,7 +210,6 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
         //val preferences = getSharedPreferences("MyPreferences", MODE_PRIVATE)
 
-        // TODO apply should only call editor apply once for the whole row, if the row is dirty
         firstClauseIdx.apply()
         secondClauseIdx.apply()
         currentLevel.apply()
@@ -228,8 +233,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        firstClauseIdx.value = firstClauseIdx.value + 1
-        /*when (event.action) {
+        when (event.action) {
             MotionEvent.ACTION_DOWN -> startY = event.y
             MotionEvent.ACTION_UP -> {
                 Log.e("WORD", "TOUCH")
@@ -244,7 +248,7 @@ class MainActivity : AppCompatActivity() {
 
                 showRandomClause()
             }
-        }*/
+        }
         return true
     }
 
@@ -268,12 +272,6 @@ class MainActivity : AppCompatActivity() {
         return phrases.filter { it.trim().isNotEmpty() }
     }
 
-
-    private val clauses = LinkedList<String>()
-
-
-
-
     /**
      * Levels consist of level and stage (current verse, and how many preceding verses respectively)
      */
@@ -284,17 +282,11 @@ class MainActivity : AppCompatActivity() {
             currentStage.value = 0
             currentLevel.inc()
             if(currentLevel.value > paragraphs.size) {
-                clauses.clear()
-                clauses.add("End of Game"); // TODO signal end of game some other way or go into loop mode
             } else {
                 // Initialise clauses for current level
-                clauses.addAll(levels.get(currentLevel.value))
             }
         }
 
-        firstClauseIdx.value = 0
-        secondClauseIdx.value = 1
-        initialiseClauses()
     }
 
     fun weightedRandomSelection(chanceArray: Array<Double>): Int {
@@ -321,36 +313,6 @@ class MainActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         logState(SaveLoadOption.Load)
-        initialiseClauses()
-    }
-
-    private fun initialiseClauses() {
-        // Check if game over and assign current paragraph
-        if (currentLevel.value < paragraphs.size) {
-            paragraphTextView.text = paragraphs[currentLevel.value]
-        } else {
-            paragraphTextView.text = "End of the game."
-            return
-        }
-
-        logState(SaveLoadOption.Debug)
-        // Initialise clauses for current stage
-        clauses.clear()
-        for (stage in currentStage.value downTo 0) {
-            Log.d("STATE", "stage: $stage lvl: ${currentLevel.value} idx: ${currentLevel.value-stage}")
-            val stageClauses = levels.get(currentLevel.value - stage)
-            clauses.addAll(stageClauses)
-        }
-
-
-        val sb = StringBuilder()
-        for (clause in clauses) {
-            sb.append(clause).append(":")
-        }
-        Log.e("LVL", sb.toString())
-        results = ArrayList(List(clauses.size) { false })
-
-        progressTextBox.text = "Level $currentLevel Stage $currentStage"
     }
 
     private var results = ArrayList<Boolean>()
@@ -361,7 +323,8 @@ class MainActivity : AppCompatActivity() {
 
         // Choose a random clause excluding the prevClause
         // -1 since the prevClause is excluded
-        var randomIndex = random.nextInt(currentStage.value+1) + clauses.size - currentStage.value+1
+        var randomIndex = random.nextInt(book.clauses.size-1)
+        Log.d("LVL", "Random $randomIndex")
         secondClauseIdx.value = if(randomIndex >= firstClauseIdx.value) randomIndex+1 else randomIndex
 
     }

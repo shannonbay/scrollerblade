@@ -47,7 +47,7 @@ class LazyInit<T>(private val initializer: () -> T) {
         }
 }
 
-abstract class SessionStateField<T>(val row: UUID, val name: String, val default: T, val context: Context) : ViewModel() {
+abstract class SessionStateField<T>(val row: UUID, val name: String, val default: T, val context: Context) {
     override fun toString(): String {
         return "{ $name $value }"
     }
@@ -64,13 +64,11 @@ abstract class SessionStateField<T>(val row: UUID, val name: String, val default
     internal val editor: SharedPreferences.Editor = sharedPreferences.edit()
 
     private val _valueLiveData = MutableLiveData<T?>()
-
-    val valueLiveData: LiveData<String> by lazy {
-        _valueLiveData.map { a ->
-            Log.d("STATE", "Transformed ${a}")
-            a.toString()
+    val valueLiveData : MutableLiveData<T?>
+        get() {
+            Log.d("STATE", "Sending stuff to map")
+            return _valueLiveData
         }
-    }
 //        get() = _valueLiveData
 
     var value: T
@@ -83,9 +81,9 @@ abstract class SessionStateField<T>(val row: UUID, val name: String, val default
                 // Set the dirty flag when the value changes
                 isDirty = true
                 Log.e("STATE", "Posting $newValue $_value $value ")
-                _valueLiveData.postValue( newValue )
-                _valueLiveData.setValue( newValue )
-                _valueLiveData.value = newValue
+                valueLiveData.postValue( newValue )
+                valueLiveData.setValue( newValue )
+                valueLiveData.value = newValue
             }
         }
 
@@ -129,8 +127,10 @@ class IntField(row: UUID, name: String, value: Int, context: Context) : SessionS
     }
     fun apply(){
         if(isDirty) {
+            Log.d("STATE", "Committing $name $value")
             editor.putInt(name, value)
             editor.apply()
+            editor.commit()
         }
     }
 

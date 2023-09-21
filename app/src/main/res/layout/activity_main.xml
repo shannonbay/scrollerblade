@@ -5,7 +5,7 @@
 
     <data>
         <variable
-            name="firstClause"
+            name="viewModel"
             type="com.github.shannonbay.wordstream.MainActivity.MyViewModel" />
     </data>
     <RelativeLayout
@@ -28,7 +28,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:background="?attr/colorSecondary"
-            android:text="@{firstClause.firstClauseIdx.valueLiveData}"
+            android:text="@{viewModel.firstClause}"
             android:textSize="18sp" />
 
         <TextView
@@ -39,7 +39,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:background="?attr/colorPrimary"
-            android:text="Second Clause"
+            android:text="@{viewModel.secondClause}"
             android:textSize="18sp" />
 
         <TextView
