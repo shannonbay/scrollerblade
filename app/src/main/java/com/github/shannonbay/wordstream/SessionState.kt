@@ -29,8 +29,11 @@ fun initSessionState(applicationContext: Context) {
 
 fun initSessionStateRoot(sp: SharedPreferences) {
     root = UUID.fromString(sp.getString("ROOT", UUID.randomUUID().toString()))
-    sp.edit().putString("ROOT", root.toString())
-    sp.edit().apply()
+    Log.d("STATE", "UUID ROOT: $root")
+    val editor = sp.edit();
+    editor.putString("ROOT", root.toString())
+    editor.apply()
+    editor.commit()
 }
 
 class LazyInit<T>(private val initializer: () -> T) {
