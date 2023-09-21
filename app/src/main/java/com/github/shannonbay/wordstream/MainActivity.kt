@@ -5,10 +5,12 @@ import android.util.Log
 import android.view.MotionEvent
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.github.shannonbay.wordstream.databinding.ActivityMainBinding
 import com.google.android.material.color.MaterialColors
 import java.util.LinkedList
@@ -53,19 +55,40 @@ class MainActivity : AppCompatActivity() {
 
     private val levels = paragraphs.map { p -> splitSentenceIntoPhrases(p) }
 
-    private val firstClause: StringField by viewModels {
-        createStringField("firstClause", "hello")
+    class MyViewModel(val firstClauseIdx: IntField) : ViewModel() {
+        private val _stringField = firstClauseIdx.valueLiveData
+        val stringField: LiveData<String>
+            get() = _stringField
+
+        fun getText(): String {
+            return firstClauseIdx.value.toString() + "bye"
+        }
+
+        private val _intField = MutableLiveData<Int>()
+
+        val intField: LiveData<Int>
+            get() = _intField
+
+        init {
+            // Initialize intField with an initial value
+            _intField.value = 0
+        }
     }
-    private val firstClauseIdx: IntField by viewModels {
+
+    val firstClause : MyViewModel by lazy {
+        MyViewModel(firstClauseIdx)
+    }
+
+    private val firstClauseIdx: IntField by lazy {
         createIntField("first", 0)
     }
-    private val secondClauseIdx : IntField by viewModels {
+    private val secondClauseIdx : IntField by lazy {
         createIntField("second", 1)
     }
-    private val currentLevel : IntField by viewModels {
+    private val currentLevel : IntField by lazy {
         createIntField("level", 0)
     }
-    private val currentStage : IntField by viewModels {
+    private val currentStage : IntField by lazy {
         createIntField("second", 0)
     }
 
@@ -78,14 +101,12 @@ class MainActivity : AppCompatActivity() {
 
         initSessionState(applicationContext)
 
-        firstClause.value = "bye2"
-        Log.d("STATE", "${firstClause.value}")
+        Log.d("STATE", "${firstClause}")
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.setVariable(BR.firstClause, firstClause)
         binding.lifecycleOwner = this // Set the lifecycle owner for LiveData updates
 
         firstClauseIdx.value = 9
-        secondClauseIdx.value = 200
         logState(SaveLoadOption.Debug)
 
         Log.d("STATE","${firstClauseIdx.valueLiveData.isInitialized} ${firstClauseIdx.valueLiveData.value} ")
@@ -207,7 +228,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        when (event.action) {
+        firstClauseIdx.value = firstClauseIdx.value + 1
+        /*when (event.action) {
             MotionEvent.ACTION_DOWN -> startY = event.y
             MotionEvent.ACTION_UP -> {
                 Log.e("WORD", "TOUCH")
@@ -222,7 +244,7 @@ class MainActivity : AppCompatActivity() {
 
                 showRandomClause()
             }
-        }
+        }*/
         return true
     }
 

@@ -121,7 +121,7 @@ class StringField(row: UUID, name: String, val __value: String, context: Context
 
 class IntField(row: UUID, name: String, value: Int, context: Context) : SessionStateField<Int>(row, name, value, context) {
     operator fun inc(): IntField {
-        _value.blah++
+        value.inc()
         return this
     }
     fun apply(){
@@ -139,30 +139,12 @@ class IntField(row: UUID, name: String, value: Int, context: Context) : SessionS
 /**
  * @param value default if no value already exists, otherwise it is initial value and default
  */
-fun createIntField(name: String, value: Int): ViewModelProvider.Factory {
-    Log.d("STATE", "Creating factory for $name with $value")
-    return object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            if (modelClass.isAssignableFrom(IntField::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                Log.d("STATE", "Creating $name with $value")
-                return IntField(root, name, value, context) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
+fun createIntField(name: String, value: Int): IntField {
+   return IntField(root, name, value, context)
 }
 
-fun createStringField(name: String, value: String): ViewModelProvider.Factory {
-    return object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
-            if (modelClass.isAssignableFrom(StringField::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return StringField(root, name, value, context) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
+fun createStringField(name: String, value: String): StringField {
+       return StringField(root, name, value, context)
 }
 
 class LazyInitializer<T>(private val initializer: () -> T) {
