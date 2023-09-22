@@ -122,7 +122,8 @@ class StringField(row: UUID, name: String, val __value: String, context: Context
 
 class IntField(row: UUID, name: String, value: Int, context: Context) : SessionStateField<Int>(row, name, value, context) {
     operator fun inc(): IntField {
-        value.inc()
+        Log.d("STATE", "inc() Increment $name")
+        value += 1
         return this
     }
     fun apply(){

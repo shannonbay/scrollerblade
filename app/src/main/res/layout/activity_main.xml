@@ -1,76 +1,96 @@
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:bind="http://schemas.android.com/apk/res-auto">
-
+    xmlns:android="http://schemas.android.com/apk/res/android" >
     <data>
         <variable
             name="viewModel"
             type="com.github.shannonbay.wordstream.MainActivity.MyViewModel" />
     </data>
-    <RelativeLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/paragraphTextView"
+
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            android:text="Your paragraph text goes here..."
-            android:textSize="18sp" />
+            android:fitsSystemWindows="true">
 
-        <TextView
-            android:id="@+id/firstClauseTextBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/colorSecondary"
-            android:text="@{viewModel.firstClause}"
-            android:textSize="18sp" />
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+        </com.google.android.material.appbar.AppBarLayout>
+        <RelativeLayout
+            app:layout_constraintBottom_toBottomOf="@id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/secondClauseTextBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/firstClauseTextBox"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/colorPrimary"
-            android:text="@{viewModel.secondClause}"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/paragraphTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
 
-        <TextView
-            android:id="@+id/resultTextBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/secondClauseTextBox"
-            android:layout_marginTop="82dp"
-            android:background="?attr/colorTertiary"
-            android:layout_centerHorizontal="true"
-            android:text="Result"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@id/secondClauseTextBox"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:background="?attr/colorPrimary"
+                android:text="@{viewModel.currentParagraph}"
+                android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/progressTextBox"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/secondClauseTextBox"
-            android:layout_marginTop="257dp"
-            android:background="?attr/colorAccent"
-            android:layout_centerHorizontal="true"
-            android:text="Progress Level"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@id/resultTextBox"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/listView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_centerVertical="true">
 
-    </RelativeLayout>
+                <TextView
+                    android:id="@+id/firstClauseTextBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="?attr/colorSecondary"
+                    android:text="@{viewModel.firstClause}"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/secondClauseTextBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:background="?attr/colorPrimary"
+                    android:text="@{viewModel.secondClause}"
+                    android:textSize="18sp" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <TextView
+                android:id="@+id/resultTextBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/progressTextBox"
+                android:layout_centerHorizontal="true"
+                android:background="?attr/colorTertiary"
+                android:text="Result"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/progressTextBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:background="?attr/colorAccent"
+                android:text="@{viewModel.currentLevelString}"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </RelativeLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>
