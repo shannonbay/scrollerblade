@@ -5,12 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ObservableInt
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.preference.PreferenceManager
 import java.util.UUID
 import kotlin.reflect.KProperty
@@ -22,6 +17,7 @@ fun initSessionState(applicationContext: Context) {
 
     context = applicationContext
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    sharedPreferences.all
 
     initSessionStateRoot(sharedPreferences)
 }
@@ -46,6 +42,8 @@ class LazyInit<T>(private val initializer: () -> T) {
             _blah = newValue
         }
 }
+
+data class Key(val row: UUID, val name: String)
 
 abstract class SessionStateField<T>(val row: UUID, val name: String, val default: T, val context: Context) {
     override fun toString(): String {
@@ -109,6 +107,18 @@ class RefField(row: UUID, name: String, value: UUID, context: Context) : Session
     }
 }
 
+class StringSetField(row: UUID, name: String, val __value: Set<String>, context: Context) : SessionStateField<Set<String>>(row, name, __value, context) {
+    fun apply(){
+        editor.putStringSet(name, value)
+        editor.apply()
+    }
+
+    override fun getDirty(): Set<String> {
+        return sharedPreferences.getStringSet(name, default)!!
+    }
+}
+
+
 class StringField(row: UUID, name: String, val __value: String, context: Context) : SessionStateField<String>(row, name, __value, context) {
     fun apply(){
         editor.putString(name, value)
@@ -148,6 +158,10 @@ fun createIntField(name: String, value: Int): IntField {
 
 fun createStringField(name: String, value: String): StringField {
        return StringField(root, name, value, context)
+}
+
+fun createStringSetField(name: String, value: Set<String>): StringSetField {
+    return StringSetField(root, name, value, context)
 }
 
 class LazyInitializer<T>(private val initializer: () -> T) {

@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ObservableArrayMap
+import androidx.databinding.ObservableMap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,6 +19,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.github.shannonbay.wordstream.databinding.ActivityMainBinding
 import com.google.android.material.color.MaterialColors
 import java.util.Random
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -70,6 +73,32 @@ class MainActivity : AppCompatActivity() {
         MyViewModel(firstClauseIdx, secondClauseIdx, book)
     }
 
+    private val bookName : UUID = UUID.fromString("Ephesians Chapter 1")
+    private val stats : Map<UUID, IntField> = HashMap<UUID, IntField>(100)
+
+    private val blah : ObservableMap<UUID, IntField> = ObservableArrayMap<UUID, IntField>()
+
+    init {
+        blah.addOnMapChangedCallback(object : ObservableMap.OnMapChangedCallback<ObservableMap<UUID, IntField>, UUID, IntField>() {
+            override fun onMapChanged(sender: ObservableMap<UUID, IntField>?, key: UUID?) {
+                if (sender != null) {
+                    if(sender.contains(key)) {
+                        clauses.value.plus(key)
+                    } else {
+                        clauses.value.minus(key)
+                    }
+                }
+            }
+        })
+    }
+
+    // ordered list of all the UUIDs for the clauses
+    private val clauses : StringSetField by lazy {
+        createStringSetField("clauses", emptySet())
+    }
+
+    // LinkedHashMap is an insertion ordered map
+    // I think we can achieve this in SP via 1. a linked list of UUID and 2. a map of indexes in insertion order
     private val firstClauseIdx: IntField by lazy {
         createIntField("first", 0)
     }
