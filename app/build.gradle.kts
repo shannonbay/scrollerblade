@@ -55,7 +55,9 @@ dependencies {
     implementation("androidx.preference:preference:1.2.0")
     implementation("androidx.databinding:databinding-runtime:8.1.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1") // or the latest version
-    implementation("androidx.lifecycle:lifecycle-livedata:2.3.1") // or the latest version
+    implementation("androidx.lifecycle:lifecycle-livedata:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2") // or the latest version
 
 
 

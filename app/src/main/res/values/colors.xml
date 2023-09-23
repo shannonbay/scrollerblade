@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="dark_green">#5ba300</color> <!-- #000000 -->
     <color name="light_green">#89ce00</color> <!-- #000000 -->
+    <color name="orange">#ff9900</color>
     <color name="blue">#0073e6</color> <!-- #ffffff -->
     <color name="dark_blue">#054FB9</color> <!-- #ffffff -->
     <color name="pink">#e6308a</color> <!-- #000000 -->

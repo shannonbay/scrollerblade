@@ -1,6 +1,25 @@
-g scrollerblade
+# scrollerblade
 
-# TODO
+## TODO
+* [ ] Consider presenting a whole verse for one of the options - this gives more opportunity to read and memorize
+	- [ ] The top should always be a complete verse and the bottom just a phrase - if you get it wrong, the bottom becomes a complete verse
+	- [ ] this mode should be a mode/phase rather than always enabled, as the two clauses mode is already quite challenging and satisfying and shouldn't be compromised
+	- [ ] Perhaps the mode should be enabled only after a mistake - of the two clauses, the one with the highest error ratio will become the whole verse
+* [ ] Setting to disable StageCompletionDialog
+* [ ] Different colours for each level - possibly a rotation and permanently associated with a paragraph
+* [ ] On each new level, force the reader to read the verse - perhaps by 'one word' and by touching through the clauses
+* [ ] Reset a book
+* [ ] Basic UI elements
+	- [x] Level and Stage ViewModel
+	- [x] Paragraph ViewModel
+* [ ] Stats and feedback
+	- [ ] Progress Meter as a gradient loading bar (weighted by currentStage/currentLevel) on the currentParagraph TextBox
+	- [ ] Show total error count and guesses in a row without error for this session/book
+	- [ ] Do a little celebratory animation/sound-effect on each new stage/level
+* [ ] Basic gamerules
+	- [ ] Track and check stage accuracy in results list
+	- [ ] Level and stage progression
+	- [ ] Select clauses relevant to stage
 * [ ] Text summary editor
 	- [ ] Ask user to write summaries by allowing them to gray out text.
 	- [ ] Then ask use for summary by highlighting key clauses ( Clauses start with to, in, of, or end with is, so)
@@ -15,7 +34,6 @@ g scrollerblade
 * [ ] persistent stats
 * [x] display current level and stage
 * [ ] Current stage/layout needs improvement on screen rotation
-* [ ] Do a little celebratory animation/sound-effect on each new stage/level
 	- [ ] Make the next phrase pop up over the screen and encourage the user to read it somehow
 * [ ] Randomize the success message
 
@@ -25,7 +43,25 @@ g scrollerblade
 	- [ ] Multi choice: for a given clause, Selecting from a set of possible next clauses
 	- [ ] Three way compare to find first
 
-# Design
+## Ideas
+Design ideas - text boxes full width, background is of organic shapes with a low contrast dark, posterized abstract scene
+
+Maybe a combo of blurry and sharp shapes - Make it look layered with depth and very subtle contrast, and
+Accelerometer texture movement and holographic shadow projection, like you're looking at a hologram
+
+Stats per verse should show as brightness or something
+
+Animate the switching of the two clauses as player swipes
+Move line processing to book constructor
+Maybe weights should be based on all time stats, ratio of errors to successes
+
+## Design principles
+- Each mode of game-play has a specific goal - eg Memorisation, Comprehension, Musing.  Do not compromise on that goal.
+	- Thus any new features introduced in a mode should specifically enhance that goal, or improve the aesthetics and streamline the interaction
+- Minimalism, highly responsive UI, minimal interactions required (Currently we have too many dialog clicks? - dialog could go away on touch rather than release)
+- the current game-play is fast, responsive, minimal and effective - any variations should be introduced as optional modes
+
+## Design
 Requirement:
 Store stats per clause, such as answersSinceLastError per UUID/row
 - We have an ordered, indexed List<String> representing the clauses
