@@ -5,12 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.ObservableInt
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.map
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.preference.PreferenceManager
 import java.util.UUID
 import kotlin.reflect.KProperty
@@ -52,7 +47,7 @@ abstract class SessionStateField<T>(val row: UUID, val name: String, val default
         return "{ $name $value }"
     }
 
-    internal val _value by lazy { LazyInit { getDirty() } }
+    private val _value by lazy { LazyInit { getDirty() } }
 
     //    protected var _value = default
     internal val sharedPreferences : SharedPreferences by lazy {

@@ -5,15 +5,15 @@ import kotlin.random.Random
 import kotlin.random.nextUInt
 
 class Book(private val sections: List<List<String>>) {
-    operator fun get(sectionIndex: Int): List<String>? {
-        return if (sectionIndex in sections.indices) {
-            sections[sectionIndex]
+    operator fun get(verseIndex: Int): List<String>? {
+        return if (verseIndex in sections.indices) {
+            sections[verseIndex]
         } else {
             null
         }
     }
 
-    fun flattenWithIndexes(list: List<List<String>>): Pair<List<String>, List<UInt>> {
+    private fun flattenWithIndexes(list: List<List<String>>): Triple<List<String>, List<UInt>, IntArray> {
         val flattenedList = mutableListOf<String>()
         val indexes = mutableListOf<UInt>()
 
@@ -21,38 +21,41 @@ class Book(private val sections: List<List<String>>) {
             indexes.add(flattenedList.size.toUInt())
             flattenedList.addAll(list[i])
         }
+        val phraseToVerse = list.flatMapIndexed { index, phrases -> phrases.map { index } }.toIntArray()
 
-        return Pair(flattenedList, indexes)
+        Log.d("BOOK", "My array ${phraseToVerse.joinToString ( " " )}")
+        return Triple(flattenedList, indexes, phraseToVerse)
     }
-
 
 //    private val pageIndexes: List<UInt> = pages.map { it.size.toUInt() }.scan(0u) { acc, size -> acc + size }
     private val book = flattenWithIndexes(sections)
     val clauses = book.first
-    private val sectionIndexes = book.second
+    private val verseIndex = book.second
+    val clausesToVerse = book.third
 
     val stats = UIntArray(clauses.size) { 0u }
 
     fun checkStats(currentLevel: Int, currentStage: Int) : Boolean {
         val first = currentLevel - currentStage
         val last = currentLevel + 1
-        val range = sectionIndexes[first] until       sectionIndexes[last] - 1u
+        val range = verseIndex[first] until       verseIndex[last] - 1u
         for (i in range) {
-            if(stats[i.toInt()] < 2u) return false
+            if(stats[i.toInt()] < 1u) return false
         }
         return true
     }
-
-    fun getWeightedRandomLine(currentLevel: Int, currentStage: Int, exclude: UInt): UInt {
+    fun getWeightedRandomLineExcludeLevel(currentLevel: Int, currentStage: Int, exclude: UInt): UInt {
         val first = currentLevel - currentStage
         val last = currentLevel + 1
-        val range = sectionIndexes[first] until sectionIndexes[last] - 1u
+        val range = verseIndex[first] until verseIndex[last]
+
+//        val excludes = verseIndex[exclude.toInt()] until verseIndex[(exclude+1u).toInt()]
 
         Log.d("STATE", "Eligible Range: ${range}")
         // Create a list of eligible line indices based on stats and exclusion
         val eligibleIndices = mutableListOf<UInt>()
         for (i in range) {
-            if(i != exclude)
+            if(clausesToVerse[i.toInt()].toUInt() != exclude)
                 eligibleIndices.add(i)
         }
 
@@ -64,7 +67,8 @@ class Book(private val sections: List<List<String>>) {
         // Calculate weights based on stats (you can adjust the weight calculation)
         val eligibleStats = eligibleIndices.map { stats[it.toInt()]+1u }
         val total = eligibleStats.sum()
-        val weights = eligibleIndices.map { total - stats[it.toInt()] }
+        val max = eligibleStats.max()
+        val weights = eligibleIndices.map { max - stats[it.toInt()] }
         Log.d("STATE", "Eligible stats: ${eligibleStats} Weights: ${weights}")
         val totalWeight = weights.sum()
         Log.d("STATE", "Eligible indices: ${eligibleIndices}")
@@ -87,39 +91,55 @@ class Book(private val sections: List<List<String>>) {
         return getRandomLine(currentLevel, currentStage, exclude)
     }
 
-    fun getWeightedRandomLine2(currentLevel: Int, currentStage: Int, exclude: UInt): UInt {
+    fun getWeightedRandomLine(currentLevel: Int, currentStage: Int, exclude: UInt): UInt {
         val first = currentLevel - currentStage
         val last = currentLevel + 1
-        val range = sectionIndexes[first] until sectionIndexes[last] - 1u
+        val range = verseIndex[first] until verseIndex[last]
 
+        Log.d("STATE", "Eligible Range: ${range}")
         // Create a list of eligible line indices based on stats and exclusion
+        val eligibleIndices = mutableListOf<UInt>()
+        for (i in range) {
+            if(i != exclude)
+                eligibleIndices.add(i)
+        }
+
+        // Check if there are any eligible indices
+        if (eligibleIndices.isEmpty()) {
+            return exclude
+        }
 
         // Calculate weights based on stats (you can adjust the weight calculation)
-        val totalWeight = stats.sum() + stats.size.toUInt()
-        val weights = stats.map { totalWeight - (stats[it.toInt()]+1u) }
-
+        val eligibleStats = eligibleIndices.map { stats[it.toInt()]+1u }
+        val total = eligibleStats.sum()
+        val max = eligibleStats.max()
+        val weights = eligibleIndices.map { max - stats[it.toInt()] }
+        Log.d("STATE", "Eligible stats: ${eligibleStats} Weights: ${weights}")
+        val totalWeight = weights.sum()
+        Log.d("STATE", "Eligible indices: ${eligibleIndices}")
+        Log.d("STATE", "Weights         : ${weights}")
         // Generate a random value within the total weight range
         val randomValue = Random.nextUInt(0u, totalWeight)
 
-        // Select a line based on weighted random value
-        Log.e("STATE", "${randomValue} ${totalWeight}")
+        Log.d("STATE", "Random Line is ${randomValue} ${totalWeight}")
 
+        // Select a line based on weighted random value
         var cumulativeWeight = 0u
-        for (i in clauses.indices) {
+        for (i in eligibleIndices.indices) {
             cumulativeWeight += weights[i]
             if (randomValue <= cumulativeWeight) {
-                Log.e("STATE", "Returning ${i}")
-                return i.toUInt()
+                return eligibleIndices[i]
             }
         }
         Log.e("STATE", "Falling back to getRandomLine!!!!!")
+        // This should not happen, but return null if something goes wrong
         return getRandomLine(currentLevel, currentStage, exclude)
     }
 
     fun getRandomLine(currentLevel: Int, currentStage: Int, exclude: UInt): UInt {
         val first = currentLevel - currentStage
         val last = currentLevel + 1
-        var r = Random.nextUInt((sectionIndexes[last] - 1u) - sectionIndexes[first]) + sectionIndexes[first]
+        var r = Random.nextUInt((verseIndex[last] - 1u) - verseIndex[first]) + verseIndex[first]
         if(r >= exclude) r++
         return r
     }

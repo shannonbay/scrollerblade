@@ -1,12 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- these are accessible theme colours -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="dark_green">#5ba300</color> <!-- #000000 -->
-    <color name="light_green">#89ce00</color> <!-- #000000 -->
-    <color name="orange">#ff9900</color>
+    <color name="dark_orange">#993f00</color>
+    <color name="mid_orange">#cf6600</color>
+    <color name="yellow">#ffbb00</color>
+    <color name="bright_tan">#bbaa66</color>
+    <color name="tan">#998866</color>
+    <color name="light_brown">#805533</color>
+    <color name="dark_brown">#664400</color>
+    <color name="cyan">#00aaff</color> <!-- #ffffff -->
     <color name="blue">#0073e6</color> <!-- #ffffff -->
-    <color name="dark_blue">#054FB9</color> <!-- #ffffff -->
+    <color name="dark_blue">#054F99</color> <!-- #ffffff -->
+    <color name="very_dark_blue">#053377</color> <!-- #ffffff -->
+
+
+    <!-- avoid these colours -->
     <color name="pink">#e6308a</color> <!-- #000000 -->
     <color name="dark_pink">#b51963</color> <!-- #ffffff -->
+
+    <color name="dark_green">#5ba300</color> <!-- #000000 -->
+    <color name="light_green">#89ce00</color> <!-- #000000 -->
+
 </resources>
