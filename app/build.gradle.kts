@@ -16,8 +16,8 @@ android {
         applicationId = "com.github.shannonbay.wordstream"
         minSdk = 28
         targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "Ephesians 1:13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
