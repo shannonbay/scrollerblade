@@ -12,5 +12,9 @@
         android:id="@+id/menu_item_reset"
         android:title="Reset"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_item_about"
+        android:title="About"
+        app:showAsAction="ifRoom" />
 
 </menu>

@@ -101,6 +101,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.menu_item_about -> {
+                val dialog = AboutDialog(packageManager, packageName)
+                dialog.show(supportFragmentManager, "LevelCompletionDialog")
+                return true
+            }
             R.id.menu_item_reset -> {
                 currentLevel.value = 0
                 currentStage.value = 0
