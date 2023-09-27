@@ -1,11 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.WordStream" parent="Theme.MaterialComponents.Light">
+    <style name="Base.Theme.WordStream" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/blue</item>
         <item name="colorSecondary">@color/dark_blue</item>
-        <item name="colorAccent">@color/orange</item>
-        <item name="colorError">@color/pink</item>
-        <item name="colorTertiary">@color/light_green</item>
+        <item name="colorPrimaryDark">@color/very_dark_blue</item>
+        <item name="colorAccent">@color/dark_brown</item>
+        <item name="colorError">@color/bright_tan</item>
+        <item name="colorTertiary">@color/cyan</item>
     </style>
 
     <style name="Theme.WordStream" parent="Base.Theme.WordStream" />

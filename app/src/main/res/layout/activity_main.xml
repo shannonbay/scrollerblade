@@ -10,12 +10,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:displayOptions="showHome|useLogo"
             android:fitsSystemWindows="true">
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -29,21 +28,12 @@
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <TextView
-                android:id="@+id/paragraphTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-
-                android:background="?attr/colorPrimary"
-                android:text="@{viewModel.currentParagraph}"
-                android:textSize="18sp" />
-
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/listView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_centerVertical="true">
+                >
 
                 <TextView
                     android:id="@+id/firstClauseTextBox"
@@ -52,6 +42,8 @@
                     android:layout_centerHorizontal="true"
                     android:background="?attr/colorSecondary"
                     android:text="@{viewModel.firstClause}"
+                    android:autoLink="web"
+                    android:padding="8dp"
                     android:textSize="18sp" />
 
                 <TextView
@@ -61,6 +53,7 @@
                     android:layout_centerHorizontal="true"
                     android:background="?attr/colorPrimary"
                     android:text="@{viewModel.secondClause}"
+                    android:padding="8dp"
                     android:textSize="18sp" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
@@ -69,14 +62,17 @@
                 android:id="@+id/resultTextBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_above="@+id/progressTextBox"
+                android:layout_below="@+id/listView"
                 android:layout_centerHorizontal="true"
                 android:background="?attr/colorTertiary"
                 android:text="Result"
                 android:textSize="18sp"
+                android:textColor="@color/black"
+                android:padding="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
 
             <TextView
                 android:id="@+id/progressTextBox"
@@ -84,8 +80,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:background="?attr/colorAccent"
+                android:background="@color/dark_orange"
                 android:text="@{viewModel.currentLevelString}"
+                android:padding="8dp"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent" />
