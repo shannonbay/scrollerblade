@@ -31,6 +31,7 @@ import com.github.shannonbay.wordstream.Debouncer
 import com.github.shannonbay.wordstream.IntField
 import com.github.shannonbay.wordstream.LevelCompletionDialog
 import com.github.shannonbay.wordstream.R
+import com.github.shannonbay.wordstream.SettingsFragment
 import com.github.shannonbay.wordstream.StageCompletionDialog
 import com.github.shannonbay.wordstream.createIntField
 import com.github.shannonbay.wordstream.databinding.FragmentSwapperBinding
@@ -68,6 +69,19 @@ class HomeFragment : Fragment(),  View.OnTouchListener {
                 val dialog =
                     AboutDialog(requireActivity().packageManager, requireActivity().packageName)
                 dialog.show(requireActivity().supportFragmentManager, "LevelCompletionDialog")
+                true
+            }
+            R.id.action_settings -> {
+                val fragmentManager = requireActivity().supportFragmentManager
+
+                // Replace the current fragment with the Settings fragment
+                fragmentManager.beginTransaction()
+                    .add(android.R.id.content, SettingsFragment())
+                    //.replace(R.id.nav_host_fragment_activity_main2, SettingsFragment()) // Replace R.id.fragment_container with the ID of your fragment container
+                    .addToBackStack("Home again") // Optional: Add to back stack to allow navigating back
+                    .commit()
+//                findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+
                 true
             }
 
