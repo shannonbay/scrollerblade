@@ -20,6 +20,8 @@ Logic/Algorithms:
 * [ ] persistent stats
 
 UI Enhancements:
+* [ ] Use stats field liveValue as the actual live value, so we don't rely on checkResult to trigger UI updates
+* [ ] change the level and stage indicator to actually just say "Verses 2-5"
 * [ ] On each new level, force the reader to read the verse - perhaps by 'one word' and by touching through the clauses
 * [ ] Randomize the success message
 * [ ] highlighting keywords in phrases

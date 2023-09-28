@@ -3,26 +3,36 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/SecondFragment">
 
-    <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.github.shannonbay.wordstream.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+   <!-- fragment
+        android:id="@+id/StatsReviewFragment"
+        android:name="com.github.shannonbay.wordstream.StatsReviewFragment"
+        android:label="@string/stats_review_fragment_label"
+        tools:layout="@layout/fragment_stats_review">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
             app:destination="@id/SecondFragment" />
     </fragment>
     <fragment
+        android:id="@+id/SwapperFragment"
+        android:name="com.github.shannonbay.wordstream.SwapperFragment"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_swapper">
+
+        <action
+            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment" />
+    </fragment -->
+    <fragment
         android:id="@+id/SecondFragment"
         android:name="com.github.shannonbay.wordstream.SecondFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 
-        <action
+        <!-- action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/SwapperFragment" / -->
     </fragment>
 </navigation>
