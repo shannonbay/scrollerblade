@@ -42,7 +42,18 @@ class LazyInit<T>(private val initializer: () -> T) {
         }
 }
 
+private val fields: MutableList<SessionStateField<*>> = mutableListOf()
+fun save(){
+   fields.forEach{ f -> if(f.isDirty) f.apply() }
+}
+
 abstract class SessionStateField<T>(val row: UUID, val name: String, val default: T, val context: Context) {
+
+    init {
+        // Add an instance of itself to the fields list on initialization
+        fields.add(this)
+    }
+
     override fun toString(): String {
         return "{ $name $value }"
     }
@@ -84,6 +95,8 @@ abstract class SessionStateField<T>(val row: UUID, val name: String, val default
 
     var isDirty: Boolean = true
         private set
+
+    internal abstract fun apply()
     internal abstract fun getDirty(): T
 }
 
@@ -94,7 +107,7 @@ private operator fun ObservableInt.inc(): ObservableInt {
 }
 
 class RefField(row: UUID, name: String, value: UUID, context: Context) : SessionStateField<UUID>(row, name, value, context) {
-    fun apply(){
+    override fun apply(){
         editor.putString(name, value.toString())
         editor.apply()
     }
@@ -105,7 +118,7 @@ class RefField(row: UUID, name: String, value: UUID, context: Context) : Session
 }
 
 class StringField(row: UUID, name: String, val __value: String, context: Context) : SessionStateField<String>(row, name, __value, context) {
-    fun apply(){
+    override fun apply(){
         editor.putString(name, value)
         editor.apply()
     }
@@ -115,13 +128,46 @@ class StringField(row: UUID, name: String, val __value: String, context: Context
     }
 }
 
+class IntArrayField(row: UUID, name: String, value: IntArray, context: Context) : SessionStateField<IntArray>(row, name, value, context) {
+
+    override fun apply(){
+        if(isDirty) {
+            Log.d("STATE", "Committing $name $value")
+            editor.putString(name, intArrayToString(value))
+            editor.apply()
+            editor.commit()
+        }
+    }
+
+    fun intArrayToString(intArray: IntArray): String {
+        return intArray.joinToString(",")
+    }
+
+    fun stringToIntArray(str: String): IntArray {
+        val strArray = str.split(",").toTypedArray()
+        return IntArray(strArray.size) { strArray[it].toInt() }
+    }
+
+    override fun getDirty(): IntArray {
+        val asString = sharedPreferences.getString(name, intArrayToString(default))
+        return stringToIntArray(asString!!)
+    }
+}
+
+/**
+ * @param value default if no value already exists, otherwise it is initial value and default
+ */
+fun createIntArrayField(name: String, value: IntArray): IntArrayField {
+    return IntArrayField(root, name, value, context)
+}
+
 class IntField(row: UUID, name: String, value: Int, context: Context) : SessionStateField<Int>(row, name, value, context) {
     operator fun inc(): IntField {
         Log.d("STATE", "inc() Increment $name")
         value += 1
         return this
     }
-    fun apply(){
+    override fun apply(){
         if(isDirty) {
             Log.d("STATE", "Committing $name $value")
             editor.putInt(name, value)

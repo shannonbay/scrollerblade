@@ -1,6 +1,7 @@
 package com.github.shannonbay.wordstream
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
@@ -33,16 +34,29 @@ class Book(private val sections: List<List<String>>) {
     private val verseIndex = book.second
     val clausesToVerse = book.third
 
-    val stats = UIntArray(clauses.size) { 0u }
+    val stats: IntArrayField by lazy {
+        createIntArrayField("stats", IntArray(clauses.size) { 0 })
+    }
 
-    fun checkStats(currentLevel: Int, currentStage: Int) : Boolean {
+    fun countZeros(currentLevel: Int, currentStage: Int): Int {
         val first = currentLevel - currentStage
         val last = currentLevel + 1
-        val range = verseIndex[first] until       verseIndex[last] - 1u
-        for (i in range) {
-            if(stats[i.toInt()] < 1u) return false
-        }
-        return true
+
+        // Ensure the range is within the bounds of the stats array
+        val rangeStart = verseIndex.getOrElse(first) { 0u }
+        val rangeEnd = verseIndex.getOrElse(last) { stats.value.size.toUInt() } -1u
+
+        // Calculate the count of zeros within the specified range
+
+        return stats.value.slice((rangeStart.toInt() until rangeEnd.toInt())).count { it == 0 }
+    }
+
+    var zeros : MutableLiveData<Int> = MutableLiveData(0)
+
+    fun checkStats(currentLevel: Int, currentStage: Int) : Boolean {
+        val x = countZeros(currentLevel, currentStage)
+        zeros.value = x
+        return x == 0
     }
     fun getWeightedRandomLineExcludeLevel(currentLevel: Int, currentStage: Int, exclude: UInt): UInt {
         val first = currentLevel - currentStage
@@ -55,7 +69,7 @@ class Book(private val sections: List<List<String>>) {
         // Create a list of eligible line indices based on stats and exclusion
         val eligibleIndices = mutableListOf<UInt>()
         for (i in range) {
-            if(clausesToVerse[i.toInt()].toUInt() != exclude)
+            if(clausesToVerse[i.toInt()].toUInt() != exclude && stats.value[i.toInt()] <= 1)
                 eligibleIndices.add(i)
         }
 
@@ -65,21 +79,21 @@ class Book(private val sections: List<List<String>>) {
         }
 
         // Calculate weights based on stats (you can adjust the weight calculation)
-        val eligibleStats = eligibleIndices.map { stats[it.toInt()]+1u }
+        val eligibleStats = eligibleIndices.map { stats.value[it.toInt()]+1 }
         val total = eligibleStats.sum()
         val max = eligibleStats.max()
-        val weights = eligibleIndices.map { max - stats[it.toInt()] }
+        val weights = eligibleIndices.map { max - stats.value[it.toInt()] }
         Log.d("STATE", "Eligible stats: ${eligibleStats} Weights: ${weights}")
         val totalWeight = weights.sum()
         Log.d("STATE", "Eligible indices: ${eligibleIndices}")
         Log.d("STATE", "Weights         : ${weights}")
         // Generate a random value within the total weight range
-        val randomValue = Random.nextUInt(0u, totalWeight)
+        val randomValue = Random.nextInt(0, totalWeight)
 
         Log.d("STATE", "Random Line is ${randomValue} ${totalWeight}")
 
         // Select a line based on weighted random value
-        var cumulativeWeight = 0u
+        var cumulativeWeight = 0
         for (i in eligibleIndices.indices) {
             cumulativeWeight += weights[i]
             if (randomValue <= cumulativeWeight) {
@@ -110,21 +124,21 @@ class Book(private val sections: List<List<String>>) {
         }
 
         // Calculate weights based on stats (you can adjust the weight calculation)
-        val eligibleStats = eligibleIndices.map { stats[it.toInt()]+1u }
+        val eligibleStats = eligibleIndices.map { stats.value[it.toInt()]+1 }
         val total = eligibleStats.sum()
         val max = eligibleStats.max()
-        val weights = eligibleIndices.map { max - stats[it.toInt()] }
+        val weights = eligibleIndices.map { max - stats.value[it.toInt()] }
         Log.d("STATE", "Eligible stats: ${eligibleStats} Weights: ${weights}")
         val totalWeight = weights.sum()
         Log.d("STATE", "Eligible indices: ${eligibleIndices}")
         Log.d("STATE", "Weights         : ${weights}")
         // Generate a random value within the total weight range
-        val randomValue = Random.nextUInt(0u, totalWeight)
+        val randomValue = Random.nextInt(0, totalWeight)
 
         Log.d("STATE", "Random Line is ${randomValue} ${totalWeight}")
 
         // Select a line based on weighted random value
-        var cumulativeWeight = 0u
+        var cumulativeWeight = 0
         for (i in eligibleIndices.indices) {
             cumulativeWeight += weights[i]
             if (randomValue <= cumulativeWeight) {

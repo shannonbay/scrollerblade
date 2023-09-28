@@ -58,6 +58,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata:2.3.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
 //    implementation("com.google.guava:guava:32.1.2-jre") // or the latest version
 
 

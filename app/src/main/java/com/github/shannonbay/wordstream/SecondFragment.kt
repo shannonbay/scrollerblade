@@ -1,11 +1,10 @@
 package com.github.shannonbay.wordstream
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.github.shannonbay.wordstream.databinding.FragmentSecondBinding
 
 /**
@@ -33,7 +32,7 @@ class SecondFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonSecond.setOnClickListener {
-            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
+//            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
         }
     }
 
