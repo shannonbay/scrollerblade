@@ -8,6 +8,8 @@ Bugs:
 
 Gameplay:
  [ ] Certain pairs are often the problem- need to identify tricky pairs and focus on context
+- [ ] modes - unscrambling/sorting, matching, spot-the-difference/comparing, find identical pairs, word search, fill in the blanks (quite similar to matchng), Word recollection
+
 
 Logic/Algorithms:
 

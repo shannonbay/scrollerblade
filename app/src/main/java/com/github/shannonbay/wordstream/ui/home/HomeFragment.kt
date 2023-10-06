@@ -125,6 +125,11 @@ class HomeFragment : Fragment(),  View.OnTouchListener {
         val remainingInStage: LiveData<String> // when we can listen to currentStage.or.currentLevel - that's an event engine!
             get() = book.zeros.map {a -> "Remaining: $a" }
 
+        val remain: LiveData<Int> // when we can listen to currentStage.or.currentLevel - that's an event engine!
+            get() = book.zeros
+        val stageSize: Int // when we can listen to currentStage.or.currentLevel - that's an event engine!
+            get() = 30
+
         val currentLevelString: LiveData<String> // when we can listen to currentStage.or.currentLevel - that's an event engine!
             get() = currentStage.valueLiveData.map {
                 if(currentStage.value == 0)

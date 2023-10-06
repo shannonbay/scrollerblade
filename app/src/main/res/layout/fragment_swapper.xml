@@ -25,14 +25,11 @@
                 android:progressBackgroundTintMode="screen"
                 android:background="@color/light_green"
                 android:backgroundTintMode="screen"
-                android:secondaryProgress="4"
-                android:secondaryProgressTint="@color/bright_tan"
-                android:secondaryProgressTintMode="add"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="visible"
-                android:max="10"
-                android:progress="2"
+                android:progress="@{viewModel.remain}"
+                android:max="@{viewModel.stageSize}"
                 app:layout_constraintTop_toTopOf="parent"
                 />
 
@@ -42,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_scrollFlags="scroll|enterAlways"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toBottomOf="@id/progressBar2">
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -51,12 +48,12 @@
                     app:layout_constraintTop_toTopOf="parent"
                     />
 
-               <!-- com.google.android.material.textview.MaterialTextView
+               <com.google.android.material.textview.MaterialTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@{viewModel.remainingInStage}"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" / -->
+                    app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.LinearLayoutCompat

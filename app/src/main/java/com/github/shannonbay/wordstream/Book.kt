@@ -69,7 +69,7 @@ class Book(private val sections: List<List<String>>) {
         // Create a list of eligible line indices based on stats and exclusion
         val eligibleIndices = mutableListOf<UInt>()
         for (i in range) {
-            if(clausesToVerse[i.toInt()].toUInt() != exclude && stats.value[i.toInt()] <= 1)
+            if(clausesToVerse[i.toInt()].toUInt() != exclude && stats.value[i.toInt()] <= 2)
                 eligibleIndices.add(i)
         }
 
